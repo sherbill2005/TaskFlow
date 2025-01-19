@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 // import 'package:task_manage_sys1/frontend/home_screen.dart';
 import 'package:task_manage_sys1/frontend/login_screen.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({super.key});
 
   @override
@@ -20,6 +24,7 @@ class MyApp extends StatelessWidget {
       ),
       home: LoginScreen(),
       // home: HomeScreen(),
+
     );
   }
 }

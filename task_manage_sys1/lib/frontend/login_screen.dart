@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
-import '../services/auth_service.dart';
+import 'registration_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,18 +13,28 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _authService = AuthService();
+  final _authService = FirebaseAuth.instance;
 
-  void _login() {
-    final username = _usernameController.text.trim();
-    final password = _passwordController.text.trim();
+  Future<void> _login() async {
+    try {
+      final email = _usernameController.text.trim();
+      final password = _passwordController.text.trim();
 
-    if (_authService.authenticate(username, password)) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+      // Sign in with email and password
+      final UserCredential user = await _authService.signInWithEmailAndPassword(
+        email: email,
+        password: password,
       );
-    } else {
+
+      if (user.user != null) {
+        // Navigate to HomeScreen after successful login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      }
+    } catch (e) {
+      // Show error message if login fails
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Invalid credentials! Please try again.')),
       );
@@ -60,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _usernameController,
                 decoration: InputDecoration(
-                  labelText: 'Username',
+                  labelText: 'Email',
                   labelStyle: TextStyle(color: Colors.white70),
                   filled: true,
                   fillColor: Colors.grey[800],
@@ -117,21 +128,19 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Forgot Password (Optional)
+              // Redirect to Registration screen
               TextButton(
                 onPressed: () {
-                  // Implement forgot password functionality
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RegistrationScreen()),
+                  );
                 },
                 child: Text(
-                  'Forgot Password?',
-                  style: TextStyle(color: Colors.blueAccent),
+                  'Don\'t have an account? Register here',
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
-              Text("Get started!",
-                  style: TextStyle(
-                    fontSize: 20,
-                  )),
-              Text("Simplifying task management, one step at a time")
             ],
           ),
         ),

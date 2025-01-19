@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:task_manage_sys1/frontend/completed_tasks_screen.dart';
+import 'package:task_manage_sys1/frontend/login_screen.dart';
 import 'add_task_screen.dart';
 import 'package:task_manage_sys1/models/task.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() {
   runApp(const MaterialApp(home: HomeScreen()));
@@ -43,7 +45,23 @@ class _HomeScreenState extends State<HomeScreen> {
       category: "Projects",
     ),
   ];
-
+Future<void> _signOut(BuildContext context) async {
+    try {
+      // Sign out from Firebase
+      await FirebaseAuth.instance.signOut();
+      
+      // Navigate back to LoginScreen after sign out
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    } catch (e) {
+      // Handle any sign-out errors here if necessary
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error signing out. Please try again.')),
+      );
+    }
+  }
   // Function to add a task to the list
   void _addNewTask(Task task) {
     setState(() {
@@ -230,7 +248,14 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               child: const Text('Add New Task'),
             ),
-          ],
+          
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () => _signOut(context), // Sign out when tapped
+            tooltip: 'Sign Out',
+          ),
+        ],
+          
         ),
       ),
     );
